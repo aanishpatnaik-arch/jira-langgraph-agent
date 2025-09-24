@@ -1,12 +1,23 @@
 from graphs.jira_agent_graph import app
 from langchain_core.messages import HumanMessage
 
-if __name__ == "__main__":
+def run_agent():
+    print("You can type 'hi' or ask for tickets by status (e.g., 'show me closed').")
     while True:
         user_input = input("You: ").strip()
-        if user_input.lower() == "exit":
+        if user_input.lower() in ("exit", "quit"):
+            print("Exiting agent.")
             break
+
+        # Prepare input state for the workflow
         input_state = {"messages": [HumanMessage(content=user_input)]}
+
+        # Invoke the LangGraph workflow
         result = app.invoke(input_state)
+
+        # Print AI responses
         for msg in result["messages"]:
             print(f"AI: {msg.content}")
+
+if __name__ == "__main__":
+    run_agent()

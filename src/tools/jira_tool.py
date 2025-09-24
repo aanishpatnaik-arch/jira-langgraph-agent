@@ -1,35 +1,43 @@
-from jira import JIRA
 from config.settings import settings
+from jira import JIRA
 
-def fetch_tickets():
-    try:
-        # Connect to Jira using official client with Basic Auth
-        jira = JIRA(
-            server="https://jira.enttxn.com",
-            basic_auth=(settings.JIRA_USERNAME, settings.JIRA_PAT)  
-            # JIRA_PAT = Personal Access Token or Password (if server allows)
+def get_jira_client():
+    # Create Jira client
+    jira = JIRA(
+        server=settings.JIRA_BASE_URL,
+        basic_auth=(settings.JIRA_USERNAME, settings.JIRA_PAT)
+    )
+    return jira
+
+def fetch_tickets_by_status(status: str = None):
+    """
+    Fetch tickets assigned to the current user.
+    Optionally filter by status (e.g., "Closed", "In Progress").
+    Returns a human-readable string.
+    """
+    jira = get_jira_client()
+    jql = "assignee = currentUser()"
+    if status:
+        jql += f" AND status = '{status}'"
+    jql += " ORDER BY updated DESC"
+
+    issues = jira.search_issues(jql, maxResults=None)
+
+    if not issues:
+        return f"No tickets found for status '{status}'." if status else "No tickets assigned."
+
+    # Format output in human-readable form
+    output = []
+    for i, issue in enumerate(issues, start=1):
+        output.append(
+            f"{i}. [{issue.key}] {issue.fields.summary} (Status: {issue.fields.status.name})"
         )
 
-        # Fetch issues for the current user
-        issues = jira.search_issues(
-            'assignee = currentUser() ORDER BY updated DESC',
-            maxResults=10,
-            fields="key,summary,status"
-        )
+    return "\n".join(output)
 
-        if not issues:
-            return "You have no assigned tickets."
-
-        # Format response
-        tickets = [
-            {
-                "key": issue.key,
-                "summary": issue.fields.summary,
-                "status": issue.fields.status.name
-            }
-            for issue in issues
-        ]
-        return f"Your assigned tickets: {tickets}"
-
-    except Exception as e:
-        return f"Error connecting to Jira: {e}"
+def fetch_statuses():
+    """
+    Return all possible statuses in the Jira instance (lowercased)
+    """
+    jira = get_jira_client()
+    return [s.name for s in jira.statuses()]
