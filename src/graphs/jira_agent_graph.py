@@ -27,7 +27,7 @@ def agent_node(state: AgentState):
             requested_status = s
             break
 
-    if "hi" in last_msg:
+    if "show me my tickets" in last_msg:
         return {
             "messages": [AIMessage(content="Hi! Fetching your tickets...")],
             "greeted": True,

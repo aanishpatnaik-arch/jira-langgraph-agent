@@ -2,7 +2,7 @@ from graphs.jira_agent_graph import app
 from langchain_core.messages import HumanMessage
 
 def run_agent():
-    print("You can type 'hi' or ask for tickets by status (e.g., 'show me closed').")
+    print("You can type 'show me my tickets' or ask for tickets by status (e.g., 'show me closed').")
     while True:
         user_input = input("You: ").strip()
         if user_input.lower() in ("exit", "quit"):
