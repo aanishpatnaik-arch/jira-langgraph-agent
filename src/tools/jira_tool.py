@@ -24,7 +24,7 @@ TEXT_EXTENSIONS = {".txt", ".csv", ".json", ".md", ".log"}
 PDF_EXTENSIONS = {".pdf"}
 EXCEL_EXTENSIONS = {".xls", ".xlsx"}
 WORD_EXTENSIONS = {".docx"}  # Removed .doc
-CHUNK_SIZE = 5000  # Characters per chunk for LLM summarization
+CHUNK_SIZE = 8000  # Characters per chunk for LLM summarization
 
 def get_jira_client():
     """Initialize and return a Jira client using settings from config."""
