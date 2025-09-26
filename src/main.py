@@ -1,5 +1,6 @@
 from graphs.jira_agent_graph import app
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
+from models.llm_config import LLMConfig
 
 def run_agent():
     print("You can type 'show me my tickets' or ask for tickets by status (e.g., 'show me closed').")
@@ -15,9 +16,11 @@ def run_agent():
         # Invoke the LangGraph workflow
         result = app.invoke(input_state)
 
-        # Print AI responses
+        # Print only AI responses
         for msg in result["messages"]:
-            print(f"AI: {msg.content}")
+            if isinstance(msg, AIMessage):
+                print(f"AI: {msg.content}")
 
 if __name__ == "__main__":
+    LLMConfig.get_llm()
     run_agent()
