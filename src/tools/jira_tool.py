@@ -53,7 +53,7 @@ def fetch_tickets_by_status(status: str = None):
         logger.debug("Current user: %s", current_user)
         profile = jira.user(current_user)
         display_name = profile.displayName
-        account_id = profile.account_id  # Add for mention detection
+        account_id = profile.raw.get('accountId')  # Correctly access accountId from raw JSON
         logger.info("User display name: %s", display_name)
 
         # JQL queries for assigned, reported, and mentioned tickets
