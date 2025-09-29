@@ -60,7 +60,7 @@ def fetch_tickets_by_status(status: str = None):
         status_clause = f" AND status = '{status}'" if status else ""
         assigned_jql = f"assignee = currentUser(){status_clause} ORDER BY updated DESC"
         reported_jql = f"reporter = currentUser(){status_clause} ORDER BY updated DESC"
-        all_issues_jql = f'text ~ "{display_name}"{status_clause} ORDER BY updated DESC'
+        # all_issues_jql = f'text ~ "{display_name}"{status_clause} ORDER BY updated DESC'
 
         # Fetch tickets
         logger.debug("Fetching assigned tickets with JQL: %s", assigned_jql)
@@ -72,26 +72,26 @@ def fetch_tickets_by_status(status: str = None):
         logger.info("Found %d reported tickets", len(reported_issues))
 
         # Fetch mentioned tickets
-        mentioned_issues = []
-        start_at = 0
-        batch_size = 50
-        logger.debug("Fetching mentioned tickets with JQL: %s", all_issues_jql)
-        while True:
-            issues = jira.search_issues(all_issues_jql, startAt=start_at, maxResults=batch_size, fields="summary,status,comment")
-            if not issues:
-                logger.debug("No more issues to fetch for mentioned tickets")
-                break
-            for issue in issues:
-                if issue in assigned_issues or issue in reported_issues:
-                    continue
-                comments = getattr(issue.fields, "comment", {}).comments or []
-                for comment in comments:
-                    if f"[~accountid:{account_id}]" in comment.body.lower():
-                        mentioned_issues.append(issue)
-                        logger.debug("Found mentioned ticket: %s", issue.key)
-                        break
-            start_at += batch_size
-        logger.info("Found %d mentioned tickets", len(mentioned_issues))
+        # mentioned_issues = []
+        # start_at = 0
+        # batch_size = 50
+        # logger.debug("Fetching mentioned tickets with JQL: %s", all_issues_jql)
+        # while True:
+        #     issues = jira.search_issues(all_issues_jql, startAt=start_at, maxResults=batch_size, fields="summary,status,comment")
+        #     if not issues:
+        #         logger.debug("No more issues to fetch for mentioned tickets")
+        #         break
+        #     for issue in issues:
+        #         if issue in assigned_issues or issue in reported_issues:
+        #             continue
+        #         comments = getattr(issue.fields, "comment", {}).comments or []
+        #         for comment in comments:
+        #             if f"[~accountid:{account_id}]" in comment.body.lower():
+        #                 mentioned_issues.append(issue)
+        #                 logger.debug("Found mentioned ticket: %s", issue.key)
+        #                 break
+        #     start_at += batch_size
+        # logger.info("Found %d mentioned tickets", len(mentioned_issues))
 
         # Helper function to format issues
         def format_issues(issues):
@@ -108,9 +108,9 @@ def fetch_tickets_by_status(status: str = None):
         if reported_issues:
             output_lines.append("\n🔹 Reported by You:")
             output_lines.extend(f"  {i+1}. {line}" for i, line in enumerate(format_issues(reported_issues)))
-        if mentioned_issues:
-            output_lines.append("\n🔹 You are Mentioned in:")
-            output_lines.extend(f"  {i+1}. {line}" for i, line in enumerate(format_issues(mentioned_issues)))
+        # if mentioned_issues:
+        #     output_lines.append("\n🔹 You are Mentioned in:")
+        #     output_lines.extend(f"  {i+1}. {line}" for i, line in enumerate(format_issues(mentioned_issues)))
 
         if output_lines:
             logger.info("Tickets fetched successfully")
